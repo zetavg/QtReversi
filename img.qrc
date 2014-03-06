@@ -2,6 +2,10 @@
 	<qresource prefix="/">
 		<file>img/stoneB.png</file>
 		<file>img/stoneW.png</file>
+		<file>img/stoneBa.png</file>
+		<file>img/stoneWa.png</file>
+		<file>img/stoneBs.png</file>
+		<file>img/stoneWs.png</file>
 		<file>img/null.png</file>
 	</qresource>
 </RCC>

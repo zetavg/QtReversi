@@ -7,12 +7,30 @@
 #include <QMouseEvent>
 #include <QToolButton>
 #include <QPushButton>
+#include <QCheckBox>
 #include <QIcon>
-#include <QSignalMapper>
+#include <QTimer>
 
 #include "game.h"
 
 Game *game;
+
+void Game::update() {
+
+	if (game->hint) {
+		int x = QCursor::pos().x() - guiBoard[0]->mapToGlobal(QPoint(0,0)).x();
+		int y = QCursor::pos().y() - guiBoard[0]->mapToGlobal(QPoint(0,0)).y();
+
+		x /= STONE_SIZE;
+		y /= STONE_SIZE;
+		if (x < BOARD_SIZE && y < BOARD_SIZE && x >= 0 && y >= 0) {
+			doHint(x, y);
+		} else {
+			doHint(-1, -1);
+		}
+	}
+
+}
 
 /* 可以偵測滑鼠事件的視窗 */
 class QMouseEventWindow : public QWidget {
@@ -27,7 +45,7 @@ void QMouseEventWindow::mouseReleaseEvent(QMouseEvent *event) {
 	int y = event->y();
 	x /= STONE_SIZE;
 	y /= STONE_SIZE;
-	if (x < BOARD_SIZE && y < BOARD_SIZE) {
+	if (x < BOARD_SIZE && y < BOARD_SIZE && x >= 0 && y >= 0) {
 		printf("Drop: (%d, %d)\n", x, y);
 		game->drop(x, y);
 	}
@@ -47,12 +65,6 @@ int main(int argc, char *argv[]) {
 	window->setFixedSize(boardWidth+200, boardWidth);
 	QWidget *board = new QWidget(window);
 	board->setFixedSize(boardWidth, boardWidth);
-
-	/* 棋盤網格排版 */
-	QGridLayout *grid = new QGridLayout;
-	grid->setSpacing(0);
-	grid->setMargin(0);
-	grid->setGeometry(QRect(0, 0, 10, 100));
 
 	/* 載入棋子圖片 */
 	QPixmap *stoneWPix = new QPixmap(":/img/stoneW.png");
@@ -75,6 +87,13 @@ int main(int argc, char *argv[]) {
 	*stoneBsPixS = stoneBsPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	QPixmap *nullPix = new QPixmap(":/img/null.png");
 
+
+	/* 棋盤網格排版 */
+	QGridLayout *grid = new QGridLayout;
+	grid->setSpacing(0);
+	grid->setMargin(0);
+	grid->setGeometry(QRect(0, 0, 10, 100));
+
 	/* 構建棋盤 */
 	QLabel *square[BOARD_SIZE*BOARD_SIZE];
 	for (int i=0; i<boardSize; i++) {
@@ -84,6 +103,7 @@ int main(int argc, char *argv[]) {
 			square[i*BOARD_SIZE+j]->setAlignment(Qt::AlignCenter);
 			square[i*BOARD_SIZE+j]->setAttribute(Qt::WA_TranslucentBackground);
 			// square[i*BOARD_SIZE+j]->setPixmap();
+			square[i*BOARD_SIZE+j]->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 			grid->addWidget(square[i*BOARD_SIZE+j], i, j);
 		}
 	}
@@ -96,19 +116,31 @@ int main(int argc, char *argv[]) {
 		nullPix);
 	game->reset();
 
+	/* 計時器 */
+	QTimer *update = new QTimer;
+	update->start(10);
+	QObject::connect(update, SIGNAL(timeout()), game, SLOT(update()));
+
+	/* UI */
+	QCheckBox *hintCheckBox = new QCheckBox("Show hints");
+	hintCheckBox->setParent(window);
+	hintCheckBox->setGeometry(boardWidth+50, 50, 100, 40);
+	QObject::connect(hintCheckBox, SIGNAL(stateChanged(int)), game, SLOT(hintSwitch(int)));
+
 	/* 按鍵 */
 	QPushButton *restartBtn = new QPushButton("Restart");
 	restartBtn->setParent(window);
-	restartBtn->setGeometry(boardWidth+50, 70, 100, 40);
+	restartBtn->setGeometry(boardWidth+50, 200, 100, 40);
 	QObject::connect(restartBtn, SIGNAL(clicked()), game, SLOT(reset()));
 
 	QPushButton *exitBtn = new QPushButton("Exit");
 	exitBtn->setParent(window);
-	exitBtn->setGeometry(boardWidth+50, 120, 100, 40);
+	exitBtn->setGeometry(boardWidth+50, 240, 100, 40);
 	QObject::connect(exitBtn, SIGNAL(clicked()), &app, SLOT(quit()));
 
+	/* 準備視窗 */
 	board->setLayout(grid);
-
+	window->setMouseTracking(true);
 	window->show();
 
 	return app.exec();

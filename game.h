@@ -44,7 +44,7 @@ class Game : public QObject {
 
 		/* 取得棋盤某格的資料 */
 		piece getBoardData(int x, int y) {
-			if (x > BOARD_SIZE || y > BOARD_SIZE || x < 0 || y < 0) return null;
+			if (x > BOARD_SIZE-1 || y > BOARD_SIZE-1 || x < 0 || y < 0) return null;
 			return boardData[x+y*BOARD_SIZE];
 		}
 
@@ -149,6 +149,7 @@ class Game : public QObject {
 		}
 
 		void calcMoveAt(int x, int y, piece who) {
+			if (x > BOARD_SIZE-1 || y > BOARD_SIZE-1 || x < 0 || y < 0) return;
 			int d;
 			piece p;
 			moves[x+y*BOARD_SIZE][1][1] = 0;
@@ -176,6 +177,39 @@ class Game : public QObject {
 			}
 		}
 
+		/* 顯示提示 */
+		void doHint(int x, int y) {
+			drawBoard();
+
+			QPixmap *aPix, *sPix;
+
+			if (nxtMove == white) {
+				aPix = guiImgStoneWa;
+				sPix = guiImgStoneWs;
+			} else {
+				aPix = guiImgStoneBa;
+				sPix = guiImgStoneBs;
+			}
+
+			if (x < BOARD_SIZE && y < BOARD_SIZE && x >= 0 && y >= 0) {
+				if (moves[x+y*BOARD_SIZE][1][1] > 0) { // 可以下
+					guiBoard[x+y*BOARD_SIZE]->setPixmap(*aPix);
+					for (int i=-1; i<2; i++) {
+						for (int j=-1; j<2; j++) { // 九宮格
+							if (!(i == 0 && j == 0)) { // 跳過中間
+								for (int d=1; d<=moves[x+y*BOARD_SIZE][1+i][1+j]; d++) {
+									guiBoard[(x+i*d)+(y+j*d)*BOARD_SIZE]->setPixmap(*sPix);
+								}
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		bool hint = false; // 是否顯示提示
+
 	public slots:
 		void reset() {
 			/* Clear the board */
@@ -196,6 +230,16 @@ class Game : public QObject {
 			printf("Restarted!\n");
 			return;
 		}
+
+		void hintSwitch(int t) {
+			if (t) hint = true;
+			else hint = false;
+			drawBoard();
+			printf("hintSwitch: %d\n", t);
+			return;
+		}
+
+		void update();
 
 
 	signals:
