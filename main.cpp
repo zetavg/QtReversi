@@ -12,35 +12,25 @@
 
 #include "game.h"
 
-void Game::reset() {
+Game *game;
 
-	/* Clear the board */
-	for (int i=0; i<BOARD_SIZE; i++) {
-		for (int j=0; j<BOARD_SIZE; j++) {
-			drop(i, j, 0);
-		}
-	}
-
-	/* Init */
-	drop(BOARD_SIZE/2, BOARD_SIZE/2, 1);
-	drop(BOARD_SIZE/2-1, BOARD_SIZE/2-1, 1);
-	drop(BOARD_SIZE/2-1, BOARD_SIZE/2, 2);
-	drop(BOARD_SIZE/2, BOARD_SIZE/2-1, 2);
-
-	printf("Restarted!\n");
-	return;
-}
-
+/* 可以偵測滑鼠事件的視窗 */
 class QMouseEventWindow : public QWidget {
 	protected:
 		void mouseReleaseEvent(QMouseEvent *event);
 };
 
+/* 在視窗上釋放滑鼠左鍵 */
 void QMouseEventWindow::mouseReleaseEvent(QMouseEvent *event) {
-	printf("Mouse: (%d, %d)\n", event->x(), event->y());
-	QString msg;
-	msg.sprintf("Mouse: (%d, %d)", event->x(), event->y());
-	this->setWindowTitle(msg);
+	printf("Mouse click on: (%d, %d)\n", event->x(), event->y());
+	int x = event->x();
+	int y = event->y();
+	x /= STONE_SIZE;
+	y /= STONE_SIZE;
+	if (x < BOARD_SIZE && y < BOARD_SIZE) {
+		printf("Drop: (%d, %d)\n", x, y);
+		game->drop(x, y);
+	}
 }
 
 int main(int argc, char *argv[]) {
@@ -71,6 +61,18 @@ int main(int argc, char *argv[]) {
 	QPixmap *stoneBPix = new QPixmap(":/img/stoneB.png");
 	QPixmap *stoneBPixS = new QPixmap;
 	*stoneBPixS = stoneBPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QPixmap *stoneWaPix = new QPixmap(":/img/stoneWa.png");
+	QPixmap *stoneWaPixS = new QPixmap;
+	*stoneWaPixS = stoneWaPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QPixmap *stoneBaPix = new QPixmap(":/img/stoneBa.png");
+	QPixmap *stoneBaPixS = new QPixmap;
+	*stoneBaPixS = stoneBaPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QPixmap *stoneWsPix = new QPixmap(":/img/stoneWs.png");
+	QPixmap *stoneWsPixS = new QPixmap;
+	*stoneWsPixS = stoneWsPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+	QPixmap *stoneBsPix = new QPixmap(":/img/stoneBs.png");
+	QPixmap *stoneBsPixS = new QPixmap;
+	*stoneBsPixS = stoneBsPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 	QPixmap *nullPix = new QPixmap(":/img/null.png");
 
 	/* 構建棋盤 */
@@ -87,7 +89,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	/* 遊戲物件 */
-	Game *game = new Game(square, stoneWPixS, stoneBPixS, nullPix);
+	game = new Game(square,
+		stoneWPixS, stoneBPixS,
+		stoneWaPixS, stoneBaPixS,
+		stoneWsPixS, stoneBsPixS,
+		nullPix);
 	game->reset();
 
 	/* 按鍵 */
