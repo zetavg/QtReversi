@@ -1,7 +1,0 @@
-<RCC>
-	<qresource prefix="/">
-		<file>stoneB.png</file>
-		<file>stoneW.png</file>
-		<file>null.png</file>
-	</qresource>
-</RCC>

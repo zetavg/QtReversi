@@ -65,13 +65,13 @@ int main(int argc, char *argv[]) {
 	grid->setGeometry(QRect(0, 0, 10, 100));
 
 	/* 載入棋子圖片 */
-	QPixmap *stoneWPix = new QPixmap(":/stoneW.png");
+	QPixmap *stoneWPix = new QPixmap(":/img/stoneW.png");
 	QPixmap *stoneWPixS = new QPixmap;
 	*stoneWPixS = stoneWPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	QPixmap *stoneBPix = new QPixmap(":/stoneB.png");
+	QPixmap *stoneBPix = new QPixmap(":/img/stoneB.png");
 	QPixmap *stoneBPixS = new QPixmap;
 	*stoneBPixS = stoneBPix->scaled(stoneSize, stoneSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-	QPixmap *nullPix = new QPixmap(":/null.png");
+	QPixmap *nullPix = new QPixmap(":/img/null.png");
 
 	/* 構建棋盤 */
 	QLabel *square[BOARD_SIZE*BOARD_SIZE];

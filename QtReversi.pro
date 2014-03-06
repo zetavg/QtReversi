@@ -11,4 +11,4 @@ QT += gui declarative
 # Input
 HEADERS += game.h
 SOURCES += main.cpp
-RESOURCES += qre.qrc
+RESOURCES += img.qrc
