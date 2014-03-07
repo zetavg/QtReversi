@@ -33,6 +33,18 @@ make distclean
 
 直接在 Qt Creator 開啓 QtReversi.pro，按 `建置專案` ...
 
+#### [Windows] Missing Qt5Core.dll?
+
+在這裡找到了答案: [http://stackoverflow.com/questions/16022967/run-exe-without-qt](http://stackoverflow.com/questions/16022967/run-exe-without-qt)
+
+在 windows 上編譯出來的 .exe 一般不會把 Qt 一起編譯進去，所以需要把 Qt 相關的 .dll 檔擺好，一起拿到其他電腦上才能執行。
+
+1. 將 “C:\Qt\Qt5.2.1\5.2.1\mingw48_32\bin” 底下的 .dll 複製到 .exe 相同的目錄。  
+*d.dll 結尾的 .dll 是除錯用的，不需要複製。
+2. 將 “C:\Qt\Qt5.2.1\5.2.1\mingw48_32\plugins\platforms” 整個資料夾複製到與 .exe 相同的目錄。
+3. 應該就可以了 :p
+
+
 ## 架構
 
 ### 檔案
