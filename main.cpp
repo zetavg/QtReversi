@@ -141,15 +141,15 @@ int main(int argc, char *argv[]) {
 	QObject::connect(game, SIGNAL(updateBScore(int)), lcdB, SLOT(display(int)));
 	QObject::connect(game, SIGNAL(updateWScore(int)), lcdW, SLOT(display(int)));
 
-	QCheckBox *aiWCheckBox = new QCheckBox("AI");
-	aiWCheckBox->setParent(window);
-	aiWCheckBox->setGeometry(boardWidth+140, 150, 50, 14);
-	QObject::connect(aiWCheckBox, SIGNAL(stateChanged(int)), game, SLOT(aiWSwitch(int)));
-
 	QCheckBox *aiBCheckBox = new QCheckBox("AI");
 	aiBCheckBox->setParent(window);
 	aiBCheckBox->setGeometry(boardWidth+140, 100, 50, 14);
 	QObject::connect(aiBCheckBox, SIGNAL(stateChanged(int)), game, SLOT(aiBSwitch(int)));
+
+	QCheckBox *aiWCheckBox = new QCheckBox("AI");
+	aiWCheckBox->setParent(window);
+	aiWCheckBox->setGeometry(boardWidth+140, 150, 50, 14);
+	QObject::connect(aiWCheckBox, SIGNAL(stateChanged(int)), game, SLOT(aiWSwitch(int)));
 
 	/* 按鍵 */
 	QPushButton *undoBtn = new QPushButton("Undo");

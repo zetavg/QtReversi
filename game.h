@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #ifndef GAME_H
 #define GAME_H
 
@@ -45,6 +46,7 @@ class Game : public QObject {
 			isAI_W = false;
 			isAI_B = false;
 			hint = false;
+			srand(time(NULL));
 		}
 
 		/* 取得棋盤某格的資料 */
@@ -97,6 +99,18 @@ class Game : public QObject {
 			}
 			updateNxtMove();
 			aiDrop();
+			if (!totalMoves) {
+				if (nxtMove == black) {
+					nxtMove = white;
+				} else {
+					nxtMove = black;
+				}
+				updateNxtMove();
+				aiDrop();
+				if (!totalMoves) {
+					end();
+				}
+			}
 		}
 
 		/* AI 落棋 */
@@ -109,7 +123,8 @@ class Game : public QObject {
 			int max = 0;
 			for (int i=0; i<BOARD_SIZE; i++) {
 				for (int j=0; j<BOARD_SIZE; j++) {
-					if (moves[i+j*BOARD_SIZE][1][1] > max) {
+					if (moves[i+j*BOARD_SIZE][1][1] > max ||
+							(moves[i+j*BOARD_SIZE][1][1] == max && rand()%2 == 0)) {
 						max = moves[i+j*BOARD_SIZE][1][1];
 						x = i;
 						y = j;
@@ -137,6 +152,11 @@ class Game : public QObject {
 					guiBoard[x+y*BOARD_SIZE]->setPixmap(*guiImgStoneB);
 					break;
 			}
+		}
+
+		void end() {
+			guiTurn->setPixmap(*guiImgStoneN);
+			printf("End\n");
 		}
 
 		/* 重繪棋盤 */
